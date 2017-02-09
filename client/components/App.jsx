@@ -1,13 +1,12 @@
 import React from 'react';
 import Location from './Location.jsx'
+import Login from './Login.jsx'
 const parser = require('parse-address');
 const apis = require('../../config');
 const googleMaps = apis.googleMaps;
 const quandl = apis.quandl;
+const fb = apis.fb;
 
-
-var count = 0;
-var apiCount = 0;
 class App extends React.Component {
 
   constructor (props) {
@@ -19,22 +18,17 @@ class App extends React.Component {
     }
     this.getAddress = this.getAddress.bind(this);
     this.getCoordAndAddress = this.getCoordAndAddress.bind(this);
-    this.renderRes = this.renderRes.bind(this);
   }
-  getQuandl () {
-    //const medianZillowRent = "https://www.quandl.com/api/v3/datasets/ZILL/Z90026_RMP.json";
-    const medianMktRent = "https://www.quandl.com/api/v3/datasets/ZILL/Z90026_RAH.json"
-  }
+ 
   getAddress(coordArray) {
     const lat = coordArray[0];
     const long = coordArray[1];
     const acc = coordArray[2];
     this.setState({
-      location: `Your GPS coords are Latitude ${lat} and Longitude ${long} with estimated accuracy of ${acc}`
+      location: `Your GPS coords are Latitude ${lat} and Longitude ${long} with estimated accuracy of ${acc} meters`
     })
     const reqUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${googleMaps.api}`
     $.getJSON(reqUrl, (data) => {
-      console.log('no. of api request made ', apiCount);
       const address = data.results[0].formatted_address
       const zip = parser.parseLocation(address).zip
       this.setState({
@@ -59,22 +53,17 @@ class App extends React.Component {
     }).then(this.getAddress);
   }
   
-  renderRes () {
-    console.log('Test Render');
-  }
-
   componentDidMount(){
-    count++
-    console.log('no. of times mounted ', count);
     this.getCoordAndAddress();
   }
-
 
   render() {
     return (
       <div>
+      <div>
         <h1 style = {styles.heading}>Around The Block</h1>
         <Location location = {this.state.location} address = {this.state.address} zip = {this.state.zip} />
+      </div>
       </div>
     )
   }
@@ -82,7 +71,7 @@ class App extends React.Component {
 
 const styles = {
   heading: {
-    color: 'blue',
+    color: '#0A40BC',
     textAlign: 'center'
   }
 };
