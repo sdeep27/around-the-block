@@ -40,6 +40,7 @@ const scraperController = {
           }
           listObj = [];
           for (let i = 0; i < titles.length; i++) {
+            console.log(prices[i]);
             listObj.push({
               price: prices[i],
               title: titles[i],
@@ -47,6 +48,7 @@ const scraperController = {
               picLink: picLinks[i]
             })
           }
+          console.log(listObj);
           res.json(listObj);
         })
 

@@ -9,7 +9,7 @@ app.use(express.static(__dirname + '/dist'));
 app.post('/options', scraperController.getData);
 
 
-app.listen(3000);
+app.listen(8000);
 
 
 module.exports = app;
