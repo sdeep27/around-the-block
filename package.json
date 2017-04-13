@@ -15,7 +15,7 @@
     "express": "^4.14.1",
     "fs": "^0.0.1-security",
     "html-webpack-plugin": "^2.28.0",
-    "node-craigslist": "^1.1.0",
+    "node-craigslist": "^1.1.1",
     "parse-address": "^0.0.6",
     "path": "^0.12.7",
     "react": "^15.4.2",

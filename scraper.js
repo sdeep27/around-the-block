@@ -5,10 +5,12 @@ const fs = require('fs');
 
 const scraperController = {
   getData (req, res) {
+    //right now it's sub as category no matter what - need to fix sending of post request
     const cat = req.body.type === 'lease' ? 'apa' : 'sub';
     const min = req.body.min; 
     const max = req.body.max;
     const zip = req.body.zip;
+    console.log(cat, min, max, zip);
     const prices = [], titles = [], urls = [], picLinks = [], promiseArray = [];
     const noImgLink = 'https://image.freepik.com/free-icon/house_318-64534.jpg'
     const client = new craigslist.Client({
@@ -21,6 +23,7 @@ const scraperController = {
       minAsk: min,
       maxAsk: max
     }
+    //Need To Display something if no results
     client.search(options, zip)
       .then((listings) => {
         listings.forEach((listing) => {
@@ -40,7 +43,6 @@ const scraperController = {
           }
           listObj = [];
           for (let i = 0; i < titles.length; i++) {
-            console.log(prices[i]);
             listObj.push({
               price: prices[i],
               title: titles[i],
@@ -48,13 +50,13 @@ const scraperController = {
               picLink: picLinks[i]
             })
           }
-          console.log(listObj);
+          console.log('final listOBJ: ', listObj);
           res.json(listObj);
         })
 
       })
       .catch((err) => {
-        console.error(err);
+        console.error('err: ', err);
     })
   }
 }
