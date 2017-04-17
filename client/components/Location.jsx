@@ -2,10 +2,10 @@ import React from 'react';
 import Options from './Options.jsx';
 
 
-function Location ({location, address, zip, renderRes}) {
+function Location ({location, address, zip, renderRes, handleChange, handleSubmit, type, min, max, results, market}) {
   var opts, loading, addressIntro;
   if (zip) {
-    opts = <Options zip = {zip}/>
+    opts = <Options zip = {zip} handleSubmit = {handleSubmit} handleChange = {handleChange} type = {type} min = {min} max = {max} results = {results} market = {market}/>
   }
   else opts = <div>Trying to find address...</div>
   if (location === 'Waiting on location...'){

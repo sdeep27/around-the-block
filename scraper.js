@@ -6,6 +6,7 @@ const fs = require('fs');
 const scraperController = {
   getData (req, res) {
     //right now it's sub as category no matter what - need to fix sending of post request
+    console.log(req.body.type);
     const cat = req.body.type === 'lease' ? 'apa' : 'sub';
     const min = req.body.min; 
     const max = req.body.max;
@@ -50,7 +51,6 @@ const scraperController = {
               picLink: picLinks[i]
             })
           }
-          console.log('final listOBJ: ', listObj);
           res.json(listObj);
         })
 

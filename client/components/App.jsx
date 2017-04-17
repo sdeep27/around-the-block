@@ -8,16 +8,22 @@ const quandl = apis.quandl;
 const fb = apis.fb;
 
 class App extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {
       location: 'Waiting on location...',
       address: '',
       zip: null,
+      type: 'lease',
+      min: 1,
+      max: 10000,
+      results: null,
+      market: null
     }
     this.getAddress = this.getAddress.bind(this);
     this.getCoordAndAddress = this.getCoordAndAddress.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
  
   getAddress(coordArray) {
@@ -52,7 +58,37 @@ class App extends React.Component {
       }, error, options) 
     }).then(this.getAddress);
   }
-  
+
+  handleChange(e) {
+    var value = e.target.value;
+    var name = e.target.name;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleSubmit(e) {
+    this.setState({results: 'waiting'})
+    let minParse = Math.floor(this.state.min);
+    let maxParse = Math.floor(this.state.max);
+    if(isNaN(minParse)) minParse = 1;
+    if(isNaN(maxParse)) maxParse = 10000;
+    $.ajax({
+      url: '/options',
+      type: 'POST',
+      data: JSON.stringify({type: this.state.type, min: minParse, max: maxParse, zip: this.state.zip}),
+      contentType: "application/json; charset=utf-8",
+      success: (data) => {
+        this.setState({results: data});
+        const marketUrl = `https://www.quandl.com/api/v3/datasets/ZILL/Z${this.state.zip}_RMP.json`
+        $.getJSON(marketUrl, (data) => {
+          this.setState({market: data.dataset.data})
+        })
+      }
+    });
+    e.preventDefault();
+  }
+
   componentDidMount(){
     this.getCoordAndAddress();
   }
@@ -62,7 +98,7 @@ class App extends React.Component {
       <div>
       <div>
         <h1 style = {styles.heading}>Around The Block</h1>
-        <Location location = {this.state.location} address = {this.state.address} zip = {this.state.zip} />
+        <Location location = {this.state.location} address = {this.state.address} zip = {this.state.zip} handleChange = {this.handleChange} handleSubmit = {this.handleSubmit} type = {this.state.type} min = {this.state.min} max = {this.state.max} results = {this.state.results} market = {this.state.market} />
       </div>
       </div>
     )

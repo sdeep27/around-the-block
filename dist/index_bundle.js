@@ -9463,6 +9463,8 @@ var _Login2 = _interopRequireDefault(_Login);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -9486,10 +9488,17 @@ var App = function (_React$Component) {
     _this.state = {
       location: 'Waiting on location...',
       address: '',
-      zip: null
+      zip: null,
+      type: 'lease',
+      min: 1,
+      max: 10000,
+      results: null,
+      market: null
     };
     _this.getAddress = _this.getAddress.bind(_this);
     _this.getCoordAndAddress = _this.getCoordAndAddress.bind(_this);
+    _this.handleChange = _this.handleChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
     return _this;
   }
 
@@ -9531,6 +9540,38 @@ var App = function (_React$Component) {
       }).then(this.getAddress);
     }
   }, {
+    key: 'handleChange',
+    value: function handleChange(e) {
+      var value = e.target.value;
+      var name = e.target.name;
+      this.setState(_defineProperty({}, name, value));
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(e) {
+      var _this3 = this;
+
+      this.setState({ results: 'waiting' });
+      var minParse = Math.floor(this.state.min);
+      var maxParse = Math.floor(this.state.max);
+      if (isNaN(minParse)) minParse = 1;
+      if (isNaN(maxParse)) maxParse = 10000;
+      $.ajax({
+        url: '/options',
+        type: 'POST',
+        data: JSON.stringify({ type: this.state.type, min: minParse, max: maxParse, zip: this.state.zip }),
+        contentType: "application/json; charset=utf-8",
+        success: function success(data) {
+          _this3.setState({ results: data });
+          var marketUrl = 'https://www.quandl.com/api/v3/datasets/ZILL/Z' + _this3.state.zip + '_RMP.json';
+          $.getJSON(marketUrl, function (data) {
+            _this3.setState({ market: data.dataset.data });
+          });
+        }
+      });
+      e.preventDefault();
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this.getCoordAndAddress();
@@ -9549,7 +9590,7 @@ var App = function (_React$Component) {
             { style: styles.heading },
             'Around The Block'
           ),
-          _react2.default.createElement(_Location2.default, { location: this.state.location, address: this.state.address, zip: this.state.zip })
+          _react2.default.createElement(_Location2.default, { location: this.state.location, address: this.state.address, zip: this.state.zip, handleChange: this.handleChange, handleSubmit: this.handleSubmit, type: this.state.type, min: this.state.min, max: this.state.max, results: this.state.results, market: this.state.market })
         )
       );
     }
@@ -9602,11 +9643,18 @@ function Location(_ref) {
   var location = _ref.location,
       address = _ref.address,
       zip = _ref.zip,
-      renderRes = _ref.renderRes;
+      renderRes = _ref.renderRes,
+      handleChange = _ref.handleChange,
+      handleSubmit = _ref.handleSubmit,
+      type = _ref.type,
+      min = _ref.min,
+      max = _ref.max,
+      results = _ref.results,
+      market = _ref.market;
 
   var opts, loading, addressIntro;
   if (zip) {
-    opts = _react2.default.createElement(_Options2.default, { zip: zip });
+    opts = _react2.default.createElement(_Options2.default, { zip: zip, handleSubmit: handleSubmit, handleChange: handleChange, type: type, min: min, max: max, results: results, market: market });
   } else opts = _react2.default.createElement(
     'div',
     null,
@@ -9751,8 +9799,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(14);
 
 var _react2 = _interopRequireDefault(_react);
@@ -9767,124 +9813,68 @@ var _MarketData2 = _interopRequireDefault(_MarketData);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function Options(_ref) {
+  var zip = _ref.zip,
+      handleChange = _ref.handleChange,
+      handleSubmit = _ref.handleSubmit,
+      type = _ref.type,
+      min = _ref.min,
+      max = _ref.max,
+      results = _ref.results,
+      market = _ref.market;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Options = function (_React$Component) {
-  _inherits(Options, _React$Component);
-
-  function Options(props) {
-    _classCallCheck(this, Options);
-
-    var _this = _possibleConstructorReturn(this, (Options.__proto__ || Object.getPrototypeOf(Options)).call(this, props));
-
-    _this.state = {
-      type: 'lease',
-      min: 1,
-      max: 10000,
-      results: null,
-      market: null
-    };
-    _this.handleChange = _this.handleChange.bind(_this);
-    _this.handleSubmit = _this.handleSubmit.bind(_this);
-    return _this;
-  }
-
-  _createClass(Options, [{
-    key: 'handleChange',
-    value: function handleChange(e) {
-      var value = e.target.value;
-      var name = e.target.name;
-      this.setState(_defineProperty({}, name, value));
-    }
-  }, {
-    key: 'handleSubmit',
-    value: function handleSubmit(e) {
-      var _this2 = this;
-
-      this.setState({ results: 'waiting' });
-      var minParse = Math.floor(this.state.min);
-      var maxParse = Math.floor(this.state.max);
-      if (isNaN(minParse)) minParse = 1;
-      if (isNaN(maxParse)) maxParse = 10000;
-      $.ajax({
-        url: '/options',
-        type: 'POST',
-        data: JSON.stringify({ type: this.state.value, min: minParse, max: maxParse, zip: this.props.zip }),
-        contentType: "application/json; charset=utf-8",
-        success: function success(data) {
-          _this2.setState({ results: data });
-          var marketUrl = 'https://www.quandl.com/api/v3/datasets/ZILL/Z' + _this2.props.zip + '_RMP.json';
-          $.getJSON(marketUrl, function (data) {
-            _this2.setState({ market: data.dataset.data });
-          });
-        }
-      });
-      e.preventDefault();
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return _react2.default.createElement(
-        'div',
-        { style: { borderTop: '1px #043953 solid', marginTop: '5px' } },
+  return _react2.default.createElement(
+    'div',
+    { style: { borderTop: '1px #043953 solid', marginTop: '5px' } },
+    _react2.default.createElement(
+      'div',
+      { style: styles.section },
+      _react2.default.createElement(
+        'form',
+        { onSubmit: handleSubmit },
         _react2.default.createElement(
-          'div',
-          { style: styles.section },
+          'label',
+          { style: styles.inputs },
+          'Temporary Sublet or Lease \xA0 \xA0',
           _react2.default.createElement(
-            'form',
-            { onSubmit: this.handleSubmit },
+            'select',
+            { style: { height: '25px', lineHeight: '25px' }, name: 'type', value: type, onChange: handleChange },
             _react2.default.createElement(
-              'label',
-              { style: styles.inputs },
-              'Temporary Sublet or Lease \xA0 \xA0',
-              _react2.default.createElement(
-                'select',
-                { style: { height: '25px', lineHeight: '25px' }, name: 'type', value: this.state.type, onChange: this.handleChange },
-                _react2.default.createElement(
-                  'option',
-                  { value: 'lease' },
-                  'Lease'
-                ),
-                _react2.default.createElement(
-                  'option',
-                  { value: 'sublet' },
-                  'Temporary Sublet'
-                )
-              )
+              'option',
+              { value: 'lease' },
+              'Lease'
             ),
             _react2.default.createElement(
-              'label',
-              { style: styles.inputs },
-              'Min Price \xA0 \xA0',
-              _react2.default.createElement('input', { name: 'min', type: 'text', style: { lineHeight: '25px', width: '50px' }, value: this.state.min, onChange: this.handleChange })
-            ),
-            _react2.default.createElement(
-              'label',
-              { style: styles.inputs },
-              'Max Price \xA0 \xA0',
-              _react2.default.createElement('input', { name: 'max', type: 'text', style: { lineHeight: '25px', width: '50px' }, value: this.state.max, onChange: this.handleChange })
-            ),
-            _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+              'option',
+              { value: 'sublet' },
+              'Temporary Sublet'
+            )
           )
         ),
         _react2.default.createElement(
-          'div',
-          { style: { marginTop: '10px' } },
-          _react2.default.createElement(_MarketData2.default, { zip: this.props.zip, market: this.state.market }),
-          _react2.default.createElement(_Results2.default, { serverCall: this.state.results })
-        )
-      );
-    }
-  }]);
-
-  return Options;
-}(_react2.default.Component);
+          'label',
+          { style: styles.inputs },
+          'Min Price \xA0 \xA0',
+          _react2.default.createElement('input', { name: 'min', type: 'text', style: { lineHeight: '25px', width: '50px' }, value: min, onChange: handleChange })
+        ),
+        _react2.default.createElement(
+          'label',
+          { style: styles.inputs },
+          'Max Price \xA0 \xA0',
+          _react2.default.createElement('input', { name: 'max', type: 'text', style: { lineHeight: '25px', width: '50px' }, value: max, onChange: handleChange })
+        ),
+        _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+      )
+    ),
+    _react2.default.createElement(
+      'div',
+      { style: { marginTop: '10px' } },
+      _react2.default.createElement(_MarketData2.default, { zip: zip, market: market }),
+      _react2.default.createElement(_Results2.default, { serverCall: results })
+    )
+  );
+}
 
 var styles = {
   section: {
