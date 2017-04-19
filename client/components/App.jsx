@@ -46,7 +46,7 @@ class App extends React.Component {
 
   getCoordAndAddress() {
     function error(err) {
-      console.warn(`ERROR(${err.code}): ${err.message}`);
+      alert(`Please resolve error, ${err.code}: ${err.message}`);
     }
     const options = {
       enableHighAccuracy: false,

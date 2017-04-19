@@ -9527,7 +9527,7 @@ var App = function (_React$Component) {
     key: 'getCoordAndAddress',
     value: function getCoordAndAddress() {
       function error(err) {
-        console.warn('ERROR(' + err.code + '): ' + err.message);
+        alert('Please resolve error, ' + err.code + ': ' + err.message);
       }
       var options = {
         enableHighAccuracy: false,
