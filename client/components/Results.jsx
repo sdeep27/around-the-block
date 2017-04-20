@@ -14,9 +14,9 @@ function Results ({serverCall}) {
       const regex = /\$\d+/;
       return dollar.match(regex).join('')
     }
-    serverCall.forEach((place) => {
+    serverCall.forEach((place, index) => {
       allResults.push(
-      <div style = {styles.item}>
+      <div key = {index} style = {styles.item}>
        <a href = {place.url}><img src = {place.picLink} height="150" width="150"></img></a>
        <a href = {place.url}><p>{place.title}</p></a>
        <p>Price: {fixPrice(place.price)}</p>

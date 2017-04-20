@@ -9942,10 +9942,10 @@ function Results(_ref) {
 
       allResults = [];
 
-      serverCall.forEach(function (place) {
+      serverCall.forEach(function (place, index) {
         allResults.push(_react2.default.createElement(
           'div',
-          { style: styles.item },
+          { key: index, style: styles.item },
           _react2.default.createElement(
             'a',
             { href: place.url },
